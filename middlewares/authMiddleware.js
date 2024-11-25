@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET;
 
 const verifyToken = (req, res, next) => {
+    // the request from the frontend should provide the token in the header and the token should be in the format of "Bearer token"
     const token = req.headers["authorization"]?.split(" ")[1];
 
     if (!token) {
