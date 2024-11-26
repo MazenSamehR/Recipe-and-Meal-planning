@@ -104,9 +104,8 @@ router.post("/login", (req, res) => {
           .compare(password, user.password)
           .then((isMatch) => {
             if (isMatch) {
-              // Generate a JWT token
               const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, {
-                expiresIn: "6h", // Token expires in 6 hour
+                expiresIn: "6h", 
               });
               res.json({
                 status: "SUCCESS",

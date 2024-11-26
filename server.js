@@ -1,12 +1,16 @@
 require("dotenv").config();
 require("./config/db");
+
 const app = require('express')();
 const port = process.env.PORT;
 const bodyParser = require('express').json;
-const UserRouter = require("./api/Auth");
-
+const authRouter = require("./api/Auth");
+const RecipeRouter = require("./api/Recipe");
+const UserRouter = require("./api/User");
 
 app.use(bodyParser());
+app.use("/auth", authRouter);
+app.use("/recipe", RecipeRouter);
 app.use("/user", UserRouter);
 
 app.listen(port, () => {
