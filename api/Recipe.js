@@ -38,16 +38,20 @@ router.get("/recipes", async (req, res) => {
 
 router.get("/recipes/:id", async (req, res) => {
   try {
-    const recipe = await Recipe.findById(req.params.id).populate(
-      "chef",
-      "username email"
-    );
+    const recipe = await Recipe.findById(req.params.id)
+      .populate("chef", "username email")
+      .populate({
+        path: "comments", 
+        match: {}
+      }).exec();
+
     if (!recipe) {
       return res.status(404).json({
         status: "FAILED",
         message: "Recipe not found",
       });
     }
+
     res.json({
       status: "SUCCESS",
       data: recipe,

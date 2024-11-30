@@ -78,6 +78,12 @@ const RecipeSchema = new Schema({
   specialTag: {
     type: String,
   },
+  comments: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Comment",
+    },
+  ],
 });
 const Recipe = mongoose.model("Recipe", RecipeSchema);
 module.exports = Recipe;

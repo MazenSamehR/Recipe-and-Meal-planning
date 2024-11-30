@@ -76,7 +76,6 @@ router.post("/:id/recipes", async (req, res) => {
   
       const savedRecipe = await recipe.save();
   
-      // Add recipe to user's Recipes list
       user.Recipes.push(savedRecipe._id);
       await user.save();
   
