@@ -49,7 +49,7 @@ router.delete("/:id", async (req, res) => {
 
 // Add a new recipe for a user
 router.post("/:id/recipes", async (req, res) => {
-    const { title, ingredients, steps, imageURL, cooktime, level, calories, serves, specialTag } = req.body;
+    const { title, description,ingredients, steps, imageURL, cooktime, level, calories, serves, specialTag } = req.body;
   
     try {
       const user = await User.findById(req.params.id);
@@ -63,6 +63,7 @@ router.post("/:id/recipes", async (req, res) => {
   
       const recipe = new Recipe({
         title,
+        description,
         ingredients,
         steps,
         imageURL,
