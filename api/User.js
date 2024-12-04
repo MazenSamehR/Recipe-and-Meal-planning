@@ -115,7 +115,6 @@ router.post("/:id/recipes", async (req, res) => {
     res.status(201).json({
       statusCode: 201,
       message: "Recipe created successfully",
-      body: savedRecipe,
     });
   } catch (err) {
     if (err.name === "ValidationError") {
