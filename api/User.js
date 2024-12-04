@@ -39,7 +39,7 @@ router.put("/:id", async (req, res) => {
   } catch (err) {
     res.status(400).json({ message: "Failed to update user", error: err });
   }
-});
+}); 
 
 // Delete a user 
 router.delete("/:id", async (req, res) => {
@@ -108,4 +108,33 @@ router.post("/:id/recipes", async (req, res) => {
     }
   });  
 
+
+router.post("/:id/favoriteList", async (req, res) => {
+    const { recipeId } = req.body;
+  
+    try {
+      const user = await User.findById(req.params.id);
+      if (!user) {
+        return res.status(404).json({
+          message: "User not found",
+        });
+      }
+      if (user.favoriteList.includes(recipeId)) {
+        return res.status(400).json({
+          message: "Recipe already in favorite list",
+        });
+      }
+
+      user.favoriteList.push(recipeId);
+      await user.save();
+      res.json(user);
+    } catch (err) {
+      res.status(500).json({
+        message: "An unexpected error occurred",
+        error: err,
+      });
+    }
+});
+
+    
 module.exports = router;
