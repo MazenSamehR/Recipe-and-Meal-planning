@@ -40,6 +40,14 @@ const UserSchema = new Schema({
         default: [],
     },
   ],
+  Education:{
+    type: String,
+    default: null,
+  },
+  Award:{
+    type: String,
+    default: null,
+  }
 });
 
 const User = mongoose.model("User", UserSchema);
