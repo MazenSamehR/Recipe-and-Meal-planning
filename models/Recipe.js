@@ -54,6 +54,7 @@ const RecipeSchema = new Schema({
   ],
   imageURL: {
     type: String,
+    default: null,
   },
   chef: {
     type: Schema.Types.ObjectId,

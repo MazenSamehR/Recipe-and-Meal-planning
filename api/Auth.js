@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const User = require("../models/User");
+const jwt = require("jsonwebtoken");
+const JWT_SECRET = process.env.JWT_SECRET;
 
 router.post("/signup", (req, res) => {
   let { username, email, password } = req.body;
@@ -50,21 +52,34 @@ router.post("/signup", (req, res) => {
 
               newUser
                 .save()
-                .then((result) => {
+                .then((user) => {
+                  // Generate JWT token
+                  const token = jwt.sign(
+                    { id: user._id, email: user.email },
+                    JWT_SECRET,
+                    { expiresIn: "6h" } // Token expiration
+                  );
+
                   res.json({
                     status: "SUCCESS",
                     message: "User created successfully!",
-                    data: result,
+                    data: {
+                      id: user._id,
+                      username: user.username,
+                      email: user.email,
+                      profilePictureURL: user.profilePictureURL,
+                      token,
+                    },
                   });
                 })
-                .catch((err) => {
+                .catch(() => {
                   res.json({
                     status: "FAILED",
                     message: "An error occurred while saving user account!",
                   });
                 });
             })
-            .catch((err) => {
+            .catch(() => {
               res.json({
                 status: "FAILED",
                 message: "An error occurred while hashing password!",
@@ -72,8 +87,7 @@ router.post("/signup", (req, res) => {
             });
         }
       })
-      .catch((err) => {
-        console.log(err);
+      .catch(() => {
         res.json({
           status: "FAILED",
           message: "An error occurred while checking for existing user!",
@@ -81,9 +95,6 @@ router.post("/signup", (req, res) => {
       });
   }
 });
-
-const jwt = require("jsonwebtoken");
-const JWT_SECRET = process.env.JWT_SECRET;
 
 router.post("/login", (req, res) => {
   let { email, password } = req.body;
@@ -96,7 +107,7 @@ router.post("/login", (req, res) => {
       message: "Empty credintials supplied!",
     });
   }
-  
+
   User.findOne({ email })
     .then((user) => {
       if (user) {
@@ -104,14 +115,23 @@ router.post("/login", (req, res) => {
           .compare(password, user.password)
           .then((isMatch) => {
             if (isMatch) {
-              const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, {
-                expiresIn: "6h", 
-              });
+              const token = jwt.sign(
+                { id: user._id, email: user.email },
+                JWT_SECRET,
+                {
+                  expiresIn: "6h",
+                }
+              );
               res.json({
                 status: "SUCCESS",
                 message: "Signin successful",
-                token,
-                data: { username: user.username, email: user.email },
+                data: {
+                  id: user._id,
+                  username: user.username,
+                  email: user.email,
+                  profilePictureURL: user.profilePictureURL,
+                  token,
+                },
               });
             } else {
               res.json({

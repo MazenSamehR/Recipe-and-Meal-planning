@@ -6,12 +6,17 @@ const Recipe = require("../models/Recipe");
 // Get all users
 router.get("/", async (req, res) => {
   try {
-    const users = await User.find().populate("favoriteList followingList Recipes");
+    const users = await User.find()
+      .select("id profilePictureURL username")
     res.json(users);
   } catch (err) {
-    res.status(500).json({ message: "Failed to fetch users", error: err });
+    res.status(500).json({
+      message: "Failed to fetch users",
+      error: err.message,
+    });
   }
 });
+
 
 // Get user by ID
 router.get("/:id", async (req, res) => {

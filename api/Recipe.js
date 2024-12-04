@@ -20,12 +20,13 @@ const Recipe = require("../models/Recipe");
 //   }
 // });
 
-router.get("/recipes", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
-    const recipe = await Recipe.find().populate("chef", "username email");
+    const recipes = await Recipe.find()
+      .select("title _id imageURL cooktime level") // Select only the required fields
     res.json({
       status: "SUCCESS",
-      data: recipe,
+      data: recipes,
     });
   } catch (err) {
     res.status(500).json({
@@ -36,13 +37,17 @@ router.get("/recipes", async (req, res) => {
   }
 });
 
-router.get("/recipes/:id", async (req, res) => {
+
+router.get("/:id", async (req, res) => {
   try {
     const recipe = await Recipe.findById(req.params.id)
       .populate("chef", "username email")
       .populate({
         path: "comments", 
-        match: {}
+        populate: {
+          path: "author",  
+          select: "username" 
+        }
       }).exec();
 
     if (!recipe) {

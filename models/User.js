@@ -17,6 +17,7 @@ const UserSchema = new Schema({
   },
   profilePictureURL: {
     type: String,
+    default: null,
   },
   favoriteList: [
     {
