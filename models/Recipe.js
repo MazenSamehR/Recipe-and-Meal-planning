@@ -89,6 +89,18 @@ const RecipeSchema = new Schema({
       ref: "Comment",
     },
   ],
+  likes: [
+    {
+      userId: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+      count: {
+        type: Number,
+        default: 0,
+      },
+    },
+  ],
 });
 const Recipe = mongoose.model("Recipe", RecipeSchema);
 module.exports = Recipe;

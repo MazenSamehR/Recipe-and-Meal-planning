@@ -37,21 +37,28 @@ const UserSchema = new Schema({
       default: [],
     },
   ],
+  followerList: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      default: [],
+    },
+  ],
   Recipes: [
     {
       type: Schema.Types.ObjectId,
       ref: "Recipe",
-        default: [],
+      default: [],
     },
   ],
-  Education:{
+  Education: {
     type: String,
     default: null,
   },
-  Award:{
+  Award: {
     type: String,
     default: null,
-  }
+  },
 });
 
 const User = mongoose.model("User", UserSchema);
