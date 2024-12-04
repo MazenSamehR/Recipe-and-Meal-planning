@@ -45,11 +45,10 @@ router.get("/:id", async (req, res) => {
       .populate({
         path: "comments",
         populate: {
-          path: "author",
-          select: "username",
-        },
-      })
-      .exec();
+          path: "author",  
+          select: "username profilePictureURL", 
+        }
+      }).exec();
 
     if (!recipe) {
       return res.status(404).json({

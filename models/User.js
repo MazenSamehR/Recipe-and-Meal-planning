@@ -19,6 +19,10 @@ const UserSchema = new Schema({
     type: String,
     default: null,
   },
+  bio: {
+    type: String,
+    default: null,
+  },
   favoriteList: [
     {
       type: Schema.Types.ObjectId,

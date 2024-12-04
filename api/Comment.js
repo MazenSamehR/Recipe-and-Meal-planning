@@ -48,9 +48,14 @@ router.post("/:id", async (req, res) => {
     // Update the recipe with the new comment
     await Recipe.findByIdAndUpdate(req.params.id, { $push: { comments: savedComment._id } });
 
+    const populatedComment = await Comment.findById(savedComment._id).populate({
+      path: "author",
+      select: "username profilePictureURL",
+    });
+
     res.status(201).json({
       message: "Comment added successfully.",
-      comment: savedComment,
+      comment: populatedComment,
     });
   } catch (err) {
     res.status(400).json({
