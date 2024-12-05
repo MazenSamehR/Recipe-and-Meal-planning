@@ -227,6 +227,14 @@ router.post("/:id/likeList", async (req, res) => {
 
     user.likeList.push(recipeId);
     await user.save();
+    const recipe = await Recipe.findById(recipeId);
+    if (!recipe) {
+      return res.status(404).json({
+      message: "Recipe not found",
+      });
+    }
+    recipe.likes += 1;
+    await recipe.save();
     res.json({
       statusCode: 200,
       message: "Recipe added to like list successfully",
@@ -261,6 +269,14 @@ router.delete("/:id/likeList", async (req, res) => {
 
     user.likeList = user.likeList.filter((id) => id.toString() !== recipeId);
     await user.save();
+    const recipe = await Recipe.findById(recipeId);
+    if (!recipe) {
+      return res.status(404).json({
+        message: "Recipe not found",
+      });
+    }
+    recipe.likes -= 1;
+    await recipe.save();
     res.json({
       statusCode: 200,
       message: "Recipe removed from like list successfully",
