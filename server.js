@@ -23,6 +23,10 @@ app.use("/recipe", RecipeRouter);
 app.use("/user", UserRouter);
 app.use("/comment", CommentRouter);
 
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: "Internal Server Error" });
+});
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });

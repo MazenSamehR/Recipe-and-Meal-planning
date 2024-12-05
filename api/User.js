@@ -65,7 +65,7 @@ router.delete("/:id", async (req, res) => {
 
 // Add a new recipe for a user
 router.post("/:id/recipes", async (req, res) => {
-  const {
+  let {
     title,
     description,
     ingredients,
@@ -88,6 +88,8 @@ router.post("/:id/recipes", async (req, res) => {
       });
     }
 
+    ingredients = JSON.parse(ingredients);
+    steps = JSON.parse(steps);
     const recipe = new Recipe({
       title,
       description,
@@ -117,6 +119,7 @@ router.post("/:id/recipes", async (req, res) => {
       message: "Recipe created successfully",
     });
   } catch (err) {
+    console.error(err.stack);
     if (err.name === "ValidationError") {
       const messages = Object.values(err.errors).map((error) => error.message);
       return res.status(400).json({
