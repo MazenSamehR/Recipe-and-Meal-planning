@@ -30,6 +30,13 @@ const UserSchema = new Schema({
       default: [],
     },
   ],
+  likeList: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Recipe",
+      default: [],
+    },
+  ],
   followingList: [
     {
       type: Schema.Types.ObjectId,

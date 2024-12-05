@@ -21,7 +21,7 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id).populate(
-      "favoriteList followingList Recipes"
+      "favoriteList followingList Recipes likeList"
     );
     if (!user) return res.status(404).json({ message: "User not found" });
     res.json(user);
@@ -137,6 +137,7 @@ router.post("/:id/recipes", async (req, res) => {
   }
 });
 
+//route to add to favorite list
 router.post("/:id/favoriteList", async (req, res) => {
   const { recipeId } = req.body;
 
@@ -155,7 +156,11 @@ router.post("/:id/favoriteList", async (req, res) => {
 
     user.favoriteList.push(recipeId);
     await user.save();
-    res.json(user);
+    res.json({
+      statusCode: 200,
+      message: "Recipe added to favorite list successfully",
+      body: user.favoriteList,
+    });
   } catch (err) {
     res.status(500).json({
       message: "An unexpected error occurred",
@@ -163,6 +168,113 @@ router.post("/:id/favoriteList", async (req, res) => {
     });
   }
 });
+
+//route to remove from favorite list
+router.delete("/:id/favoriteList", async (req, res) => {
+  const { recipeId } = req.body;
+
+  try {
+    const user
+    = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+    if (!user.favoriteList.includes(recipeId)) {
+      return res.status(400).json({
+        message: "Recipe not in favorite list",
+      });
+    }
+
+    user.favoriteList = user.favoriteList.filter(
+      (id) => id.toString() !== recipeId
+    );
+    await user.save();
+    res.json({
+      statusCode: 200,
+      message: "Recipe removed from favorite list successfully",
+      body: user.favoriteList,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "An unexpected error occurred",
+      error: err,
+    });
+  }
+});
+
+
+
+
+
+//route to add to likelist
+router.post("/:id/likeList", async (req, res) => {
+  const { recipeId } = req.body;
+
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+    if (user.likeList.includes(recipeId)) {
+      return res.status(400).json({
+        message: "Recipe already in like list",
+      });
+    }
+
+    user.likeList.push(recipeId);
+    await user.save();
+    res.json({
+      statusCode: 200,
+      message: "Recipe added to like list successfully",
+      body: user.likeList,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "An unexpected error occurred",
+      error: err,
+    });
+  }
+});
+
+
+//route to remove from likelist
+router.delete("/:id/likeList", async (req, res) => {
+  const { recipeId } = req.body;
+
+  try {
+    const
+    user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+    if (!user.likeList.includes(recipeId)) {
+      return res.status(400).json({
+        message: "Recipe not in like list",
+      });
+    }
+
+    user.likeList = user.likeList.filter((id) => id.toString() !== recipeId);
+    await user.save();
+    res.json({
+      statusCode: 200,
+      message: "Recipe removed from like list successfully",
+      body: user.likeList,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "An unexpected error occurred",
+      error: err,
+    });
+  }
+});
+
+
 
 router.post("/:followeeId/follow/:followingId", async (req, res) => {
   const { followeeId, followingId } = req.params;
