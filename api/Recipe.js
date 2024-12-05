@@ -41,7 +41,7 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     const recipe = await Recipe.findById(req.params.id)
-      .populate("chef", "username email")
+      .populate("chef", "username email profilePictureURL")
       .populate({
         path: "comments",
         populate: {
