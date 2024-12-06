@@ -7,7 +7,7 @@ const Recipe = require("../models/Recipe");
 router.get("/", async (req, res) => {
   try {
     const recipes = await Recipe.find().select(
-      "title _id imageURL cooktime level"
+      "title _id imageURL cooktime level chef likes"
     ); // Select only the required fields
     res.json({
       status: "SUCCESS",
