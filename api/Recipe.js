@@ -70,7 +70,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.put("/recipes/:id", async (req, res) => {
+router.put("/:id", async (req, res) => {
   try {
     const updatedRecipe = await Recipe.findByIdAndUpdate(
       req.params.id,
