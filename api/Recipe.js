@@ -97,73 +97,7 @@ router.put("/recipes/:id", async (req, res) => {
   }
 });
 
-router.put("/:userId/like/:id", async (req, res) => {
-  try {
-    const updatedRecipe = await Recipe.findByIdAndUpdate(
-      req.params.id,
-      { $inc: { likes: 1 } },
-      { new: true }
-    );
-    if (!updatedRecipe) {
-      return res.status(404).json({
-        status: "FAILED",
-        message: "Recipe not found",
-      });
-    }
-    res.json({
-      status: "SUCCESS",
-      message: "Recipe liked successfully",
-      data: updatedRecipe,
-    });
-  } catch (err) {
-    res.status(400).json({
-      status: "FAILED",
-      message: "Error liking recipe",
-      error: err.message,
-    });
-  }
-});
 
-router.put("/:userId/dislike/:id", async (req, res) => {
-  try {
-    const recipe = await Recipe.findById(req.params.id);
-    if (!recipe) {
-      return res.status(404).json({
-        status: "FAILED",
-        message: "Recipe not found",
-      });
-    }
-    if (recipe.likes === 0) {
-      return res.status(400).json({
-        status: "FAILED",
-        message: "Recipe has no likes to remove",
-      });
-    }
-    const updatedRecipe = await Recipe.findByIdAndUpdate(
-      req.params.id,
-      { $inc: { likes: -1 } },
-      { new: true }
-    );
-
-    if (!updatedRecipe) {
-      return res.status(404).json({
-        status: "FAILED",
-        message: "Recipe not found",
-      });
-    }
-    res.json({
-      status: "SUCCESS",
-      message: "Recipe disliked successfully",
-      data: updatedRecipe,
-    });
-  } catch (err) {
-    res.status(400).json({
-      status: "FAILED",
-      message: "Error disliking recipe",
-      error: err.message,
-    });
-  }
-});
 
 router.delete("/recipes/:id", async (req, res) => {
   try {
