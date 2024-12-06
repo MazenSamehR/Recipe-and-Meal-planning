@@ -419,4 +419,31 @@ router.get("/:id/followers", async (req, res) => {
   }
 });
 
+//get recipes that is in favorite list
+router.get("/:id/favoriteList", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).populate({
+      path: "favoriteList",
+      model: "Recipe",
+    });
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+    res.json({
+      statusCode: 200,
+      message: "Favorite recipes retrieved successfully",
+      body: user.favoriteList,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "An unexpected error occurred",
+      error: err,
+    });
+  }
+});
+
+
+
 module.exports = router;
