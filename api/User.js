@@ -291,83 +291,76 @@ router.delete("/:id/likeList", async (req, res) => {
 });
 
 
-
 router.post("/:followeeId/follow/:followingId", async (req, res) => {
   const { followeeId, followingId } = req.params;
   try {
+    if (followeeId === followingId) {
+      return res.status(400).json({ message: "You cannot follow yourself" });
+    }
+
     const followeeUser = await User.findById(followeeId);
     const followingUser = await User.findById(followingId);
+
     if (!followeeUser || !followingUser) {
-      return res.status(404).json({
-        message: "User not found",
-      });
+      return res.status(404).json({ message: "User not found" });
     }
 
-    if (followeeUser === followingUser) {
-      return res.status(400).json({
-        message: "You cannot follow yourself",
-      });
-    }
-
-    if (followeeUser.followingList.includes(followingId)) {
-      return res.status(400).json({
-        message: "User already in following list",
-      });
+    if (followeeUser.followingList.includes(followingId.toString())) {
+      return res.status(400).json({ message: "User already in following list" });
     }
 
     followeeUser.followingList.push(followingId);
+    followingUser.followerList.push(followeeId);
+
     await followeeUser.save();
-    // return sth in the response like this message: , statusCode and body:
+    await followingUser.save();
+
     res.json({
       statusCode: 200,
       message: "User followed successfully",
-      body: followeeUser,
     });
   } catch (err) {
-    res.status(500).json({
-      message: "An unexpected error occurred",
-      error: err,
-    });
+    res.status(500).json({ message: "An unexpected error occurred", error: err });
   }
 });
 
-// make unfollow route
 router.post("/:followeeId/unfollow/:followingId", async (req, res) => {
   const { followeeId, followingId } = req.params;
   try {
+    if (followeeId === followingId) {
+      return res.status(400).json({ message: "You cannot unfollow yourself" });
+    }
+
     const followeeUser = await User.findById(followeeId);
     const followingUser = await User.findById(followingId);
+
     if (!followeeUser || !followingUser) {
-      return res.status(404).json({
-        message: "User not found",
-      });
+      return res.status(404).json({ message: "User not found" });
     }
-    if (followeeUser === followingUser) {
-      return res.status(400).json({
-        message: "You cannot unfollow yourself",
-      });
+
+    if (!followeeUser.followingList.includes(followingId.toString())) {
+      return res.status(400).json({ message: "User not in following list" });
     }
-    if (!followeeUser.followingList.includes(followingId)) {
-      return res.status(400).json({
-        message: "User not in following list",
-      });
-    }
+
     followeeUser.followingList = followeeUser.followingList.filter(
       (id) => id.toString() !== followingId
     );
+    followingUser.followerList = followingUser.followerList.filter(
+      (id) => id.toString() !== followeeId
+    );
+
     await followeeUser.save();
+    await followingUser.save();
+
     res.json({
       statusCode: 200,
       message: "User unfollowed successfully",
-      body: followeeUser,
     });
   } catch (err) {
-    res.status(500).json({
-      message: "An unexpected error occurred",
-      error: err,
-    });
+    res.status(500).json({ message: "An unexpected error occurred", error: err });
   }
 });
+
 
 router.get("/:id/following", async (req, res) => {
   try {
