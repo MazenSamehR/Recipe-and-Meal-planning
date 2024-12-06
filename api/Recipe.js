@@ -2,23 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Recipe = require("../models/Recipe");
 
-// router.post("/recipes", async (req, res) => {
-//   try {
-//     const recipe = new Recipe(req.body);
-//     const savedRecipe = await recipe.save();
-//     res.status(201).json({
-//       status: "SUCCESS",
-//       message: "Recipe created successfully",
-//       data: savedRecipe,
-//     });
-//   } catch (err) {
-//     res.status(400).json({
-//       status: "FAILED",
-//       message: "Error creating recipe",
-//       error: err.message,
-//     });
-//   }
-// });
+
 
 router.get("/", async (req, res) => {
   try {
@@ -99,7 +83,7 @@ router.put("/:id", async (req, res) => {
 
 
 
-router.delete("/recipes/:id", async (req, res) => {
+router.delete("/:id", async (req, res) => {
   try {
     const deletedRecipe = await Recipe.findByIdAndDelete(req.params.id);
     if (!deletedRecipe) {
