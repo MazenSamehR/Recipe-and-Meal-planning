@@ -174,8 +174,7 @@ router.delete("/:id/favoriteList", async (req, res) => {
   const { recipeId } = req.body;
 
   try {
-    const user
-    = await User.findById(req.params.id);
+    const user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).json({
         message: "User not found",
@@ -204,10 +203,6 @@ router.delete("/:id/favoriteList", async (req, res) => {
   }
 });
 
-
-
-
-
 //route to add to likelist
 router.post("/:id/likeList", async (req, res) => {
   const { recipeId } = req.body;
@@ -230,7 +225,7 @@ router.post("/:id/likeList", async (req, res) => {
     const recipe = await Recipe.findById(recipeId);
     if (!recipe) {
       return res.status(404).json({
-      message: "Recipe not found",
+        message: "Recipe not found",
       });
     }
     recipe.likes += 1;
@@ -248,14 +243,12 @@ router.post("/:id/likeList", async (req, res) => {
   }
 });
 
-
 //route to remove from likelist
 router.delete("/:id/likeList", async (req, res) => {
   const { recipeId } = req.body;
 
   try {
-    const
-    user = await User.findById(req.params.id);
+    const user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).json({
         message: "User not found",
@@ -290,7 +283,6 @@ router.delete("/:id/likeList", async (req, res) => {
   }
 });
 
-
 router.post("/:followeeId/follow/:followingId", async (req, res) => {
   const { followeeId, followingId } = req.params;
   try {
@@ -306,7 +298,9 @@ router.post("/:followeeId/follow/:followingId", async (req, res) => {
     }
 
     if (followeeUser.followingList.includes(followingId.toString())) {
-      return res.status(400).json({ message: "User already in following list" });
+      return res
+        .status(400)
+        .json({ message: "User already in following list" });
     }
 
     followeeUser.followingList.push(followingId);
@@ -320,7 +314,9 @@ router.post("/:followeeId/follow/:followingId", async (req, res) => {
       message: "User followed successfully",
     });
   } catch (err) {
-    res.status(500).json({ message: "An unexpected error occurred", error: err });
+    res
+      .status(500)
+      .json({ message: "An unexpected error occurred", error: err });
   }
 });
 
@@ -357,10 +353,11 @@ router.post("/:followeeId/unfollow/:followingId", async (req, res) => {
       message: "User unfollowed successfully",
     });
   } catch (err) {
-    res.status(500).json({ message: "An unexpected error occurred", error: err });
+    res
+      .status(500)
+      .json({ message: "An unexpected error occurred", error: err });
   }
 });
-
 
 router.get("/:id/following", async (req, res) => {
   try {
@@ -437,6 +434,59 @@ router.get("/:id/favoriteList", async (req, res) => {
   }
 });
 
+// get recipes that is in Meal list
+router.get("/:userId/meals", async (req, res) => {
+  const { userId } = req.params;
 
+  try {
+    const user = await User.findById(userId).populate({
+      path: "Meals.recipe",
+      select: "id title imageURL ingredients"
+    }).exec();
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ meals: user.Meals });
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching meals: " + error.message });
+  }
+});
+
+// Add or update a meal for a user
+router.put("/:userId/meals", async (req, res) => {
+  const { userId } = req.params;
+  const { key, recipeId } = req.body;
+
+  if (!key || !recipeId) {
+    return res.status(400).json({ message: "Key and recipeId are required" });
+  }
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if the meal key already exists
+    const existingMealIndex = user.Meals.findIndex((meal) => meal.key === key);
+
+    if (existingMealIndex !== -1) {
+      // Replace the existing recipe
+      user.Meals[existingMealIndex].recipe = recipeId;
+    } else {
+      // Add a new meal entry
+      user.Meals.push({ key, recipe: recipeId });
+    }
+
+    await user.save();
+
+    res.status(200).json({ meals: user.Meals });
+  } catch (error) {
+    res.status(500).json({ error: "Error adding or updating meal: " + error.message });
+  }
+});
 
 module.exports = router;

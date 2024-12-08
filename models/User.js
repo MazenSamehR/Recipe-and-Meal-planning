@@ -66,6 +66,20 @@ const UserSchema = new Schema({
     type: String,
     default: null,
   },
+  Meals: [
+    {
+      key: {
+        type: String,
+        enum: ["Breakfast", "Lunch", "Dinner"],
+        required: true,
+      },
+      recipe: {
+        type: Schema.Types.ObjectId,
+        ref: "Recipe",
+        required: true,
+      },
+    },
+  ],
 });
 
 const User = mongoose.model("User", UserSchema);
