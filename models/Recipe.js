@@ -89,8 +89,26 @@ const RecipeSchema = new Schema({
       ref: "Comment",
     },
   ],
-  likes: {type:Number,
-  default: 0,
+  likes: {
+    type: Number,
+    default: 0,
+  },
+  rating: [
+    {
+      user: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+      },
+      rating: {
+        type: Number,
+        required: true,
+      },
+    },
+  ],
+  averageRating: {
+    type: Number,
+    default: 0,
   },
 });
 const Recipe = mongoose.model("Recipe", RecipeSchema);

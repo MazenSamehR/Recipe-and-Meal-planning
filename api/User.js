@@ -439,10 +439,12 @@ router.get("/:userId/meals", async (req, res) => {
   const { userId } = req.params;
 
   try {
-    const user = await User.findById(userId).populate({
-      path: "Meals.recipe",
-      select: "id title imageURL ingredients"
-    }).exec();
+    const user = await User.findById(userId)
+      .populate({
+        path: "Meals.recipe",
+        select: "id title imageURL ingredients",
+      })
+      .exec();
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -485,7 +487,70 @@ router.put("/:userId/meals", async (req, res) => {
 
     res.status(200).json({ meals: user.Meals });
   } catch (error) {
-    res.status(500).json({ error: "Error adding or updating meal: " + error.message });
+    res
+      .status(500)
+      .json({ error: "Error adding or updating meal: " + error.message });
+  }
+});
+
+router.put("/:userId/:recipeId/rate", async (req, res) => {
+    
+  const { userId, recipeId } = req.params;
+  const { rating } = req.body;
+
+  console.log(`Rating recipe ${recipeId} by user ${userId} with rating ${rating}`);
+  if (!rating || rating < 1 || rating > 5) {
+    return res.status(400).json({
+      message: "Rating must be between 1 and 5.",
+    });
+  }
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    const recipe = await Recipe.findById(recipeId);
+    if (!recipe) {
+      return res.status(404).json({
+        message: "Recipe not found",
+      });
+    }
+
+    // Check if the user already rated the recipe
+    const existingRating = recipe.rating.find(
+      (r) => r.user.toString() === userId
+    );
+
+    if (existingRating) {
+      // Update the existing rating
+      existingRating.rating = rating;
+    } else {
+      // Add a new rating
+      recipe.rating.push({ user: userId, rating });
+    }
+
+    // Calculate the average rating
+    const totalRatings = recipe.rating.reduce((sum, r) => sum + r.rating, 0);
+    recipe.averageRating = totalRatings / recipe.rating.length;
+
+    await recipe.save();
+
+    res.status(200).json({
+      message: "Rating added/updated successfully.",
+      data: {
+        recipeId: recipe._id,
+        averageRating: recipe.averageRating,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "An unexpected error occurred",
+      error: err.message,
+    });
   }
 });
 
